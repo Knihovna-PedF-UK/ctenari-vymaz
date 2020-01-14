@@ -21,7 +21,6 @@ local function parse_line(line, subs)
     end
     local word = utf8.char(table.unpack(chars)):gsub("^%s*", ""):gsub("%s*$", "")
     t[#t+1] = word
-    print(t[#t])
   end
   return t
 end
@@ -34,10 +33,20 @@ end
 local tpl = "-----  ------------  ----------------------------  ---------------  ---------------------  -----------  -----------  -----------"
 local subs = get_subs(tpl)
 
+local records = {}
 for line in io.lines() do
   local rec = parse_line(line, subs)
   -- zkontrolovat, že řádek skutečně obsahuje záznam
-  print(table.concat(rec, "\t"))
+  if  rec[2]:match("^[0-9]+$") then
+    records[#records+1]  = rec
+    -- print(table.concat(rec, "\t"))
+  -- jméno rozdělené na víc řádků
+  elseif rec[1] == "" and rec[2] == "" and rec[3] ~="" then 
+    -- přidat jméno do předešlého záznamu
+    records[#records][3] = records[#records][3] .. rec[3]
+  end
+end
 
-  
+for _, rec in ipairs(records) do
+  print(table.concat(rec, "\t"))
 end
